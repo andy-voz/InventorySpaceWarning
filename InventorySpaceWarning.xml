@@ -1,15 +1,15 @@
 <GuiXml>
   <Controls>
-    <TopLevelControl name="InventoryWarningIndicator" mouseEnabled="true" movable="true" clampedToScreen="true">
+    <TopLevelControl name="InventorySpaceIndicator" mouseEnabled="true" movable="true" clampedToScreen="true">
       <Dimensions x="60" y="60" />
       <Anchor point="BOTTOMLEFT" relativeTo="GuiRoot" offsetX="150" offsetY="-10" />
 
       <OnMoveStop>
-        InventoryWarning.OnIndicatorMoveStop()
+        InventorySpaceWarning.OnIndicatorMoveStop()
       </OnMoveStop>
  
       <Controls>
-        <Texture name="$(parent)Icon" textureFile="InventoryWarning/res/sack-icon.dds">
+        <Texture name="$(parent)Icon" textureFile="InventorySpaceWarning/res/sack-icon.dds">
             <Anchor point="CENTER" />
             <Dimensions x="50" y="50"/>
         </Texture>

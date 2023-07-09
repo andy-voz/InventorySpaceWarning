@@ -5,7 +5,7 @@
 ## Version: 0.0.1
 ## APIVersion: 101037
 ## DependsOn: LibDebugLogger>=255
-## SavedVariables: InventoryWarningSavedVariables
+## SavedVariables: InventorySpaceWarningSavedVariables
 
-InventoryWarning.lua
-InventoryWarning.xml
+InventorySpaceWarning.lua
+InventorySpaceWarning.xml

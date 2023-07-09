@@ -1,8 +1,8 @@
 #!/bin/bash
 rm -rf .pack
-mkdir -p .pack/InventoryWarning
-cp InventoryWarning.* .pack/InventoryWarning/
-cp res/*.dds .pack/InventoryWarning/res/
+mkdir -p .pack/InventorySpaceWarning
+cp InventorySpaceWarning.* .pack/InventorySpaceWarning/
+cp res/*.dds .pack/InventorySpaceWarning/res/
 cd .pack
-zip -r InventoryWarning.zip InventoryWarning
+zip -r InventorySpaceWarning.zip InventorySpaceWarning
 cd -
