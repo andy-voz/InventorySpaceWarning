@@ -4,6 +4,7 @@ InventorySpaceWarning = {}
 InventorySpaceWarning.name = "InventorySpaceWarning"
 
 local logger = LibDebugLogger(InventorySpaceWarning.name)
+local defaultSpaceLimit = 10
 
 function InventorySpaceWarning.OnIndicatorMoveStop()
     InventorySpaceWarning.savedVariables.left = InventorySpaceIndicator:GetLeft()
@@ -49,6 +50,11 @@ local function _onfragmentChange(oldState, newState)
     end
 end
 
+local function _updateSpaceLimit(value)
+    InventorySpaceWarning.savedVariables.spaceLimit = value
+    _updateVisibility()
+end
+
 local function _initializeSettings()
     local LAM = LibAddonMenu2
     local panelName = "InventorySpaceWarningSettingsPanel"
@@ -68,9 +74,9 @@ local function _initializeSettings()
             min = 1,
             max = 100,
             step = 1,
-            default = 10,
+            default = defaultSpaceLimit,
             getFunc = function () return InventorySpaceWarning.savedVariables.spaceLimit end,
-            setFunc = function (value) InventorySpaceWarning.savedVariables.spaceLimit = value end,
+            setFunc = function (value) _updateSpaceLimit(value) end,
         }
     }
     LAM:RegisterAddonPanel(panelName, panelData)
@@ -82,8 +88,11 @@ local function _initialize()
     EVENT_MANAGER:AddFilterForEvent(InventorySpaceWarning.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
 
     InventorySpaceWarning.savedVariables = ZO_SavedVars:NewCharacterIdSettings("InventorySpaceWarningSavedVariables", 1, nil, {})
-    _restoreSavedPosition()
+    if not InventorySpaceWarning.savedVariables.spaceLimit then
+        InventorySpaceWarning.savedVariables.spaceLimit = defaultSpaceLimit
+    end
 
+    _restoreSavedPosition()
     _initializeSettings()
 
     local fragment = HUD_FRAGMENT
