@@ -1,6 +1,8 @@
 # Inventory Space Warning
 *The Elder Scrolls Online Addon*
 
+[Download from ESO UI](https://www.esoui.com/downloads/fileinfo.php?id=3674)
+
 Limited inventory space can lead to a very unpleasant surprise. It's annoying to monitor the inventory space to be sure you don't need to trade your stuff yet.
 
 This addon adds an indicator to warn you if you're running low on the inventory space:
