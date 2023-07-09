@@ -4,7 +4,7 @@
 ## AddOnVersion: 1
 ## Version: 0.0.1
 ## APIVersion: 101037
-## DependsOn: LibDebugLogger>=255
+## DependsOn: LibDebugLogger>=255 LibAddonMenu-2.0
 ## SavedVariables: InventorySpaceWarningSavedVariables
 
 InventorySpaceWarning.lua

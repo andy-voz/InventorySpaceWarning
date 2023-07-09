@@ -11,7 +11,7 @@ function InventorySpaceWarning.OnIndicatorMoveStop()
 end
 
 local function _updateVisibility()
-    InventorySpaceIndicator:SetHidden(not InventorySpaceWarning.showingHud or InventorySpaceWarning.freeSlots > 10)
+    InventorySpaceIndicator:SetHidden(not InventorySpaceWarning.showingHud or InventorySpaceWarning.freeSlots > InventorySpaceWarning.savedVariables.spaceLimit)
 end
 
 function InventorySpaceWarning.CheckFreeSlots()
@@ -49,12 +49,42 @@ local function _onfragmentChange(oldState, newState)
     end
 end
 
+local function _initializeSettings()
+    local LAM = LibAddonMenu2
+    local panelName = "InventorySpaceWarningSettingsPanel"
+
+    local panelData = {
+        type = "panel",
+        name = "Inventory Space Warning",
+        author = "Pachvara",
+        slashCommand = "/inventorySpaceWarning"
+    }
+
+    local optionsTable = {
+        [1] = {
+            type = "slider",
+            name = "Warn at",
+            tooltip = "Indicator will be shown when this amount of the inventory space is left",
+            min = 1,
+            max = 100,
+            step = 1,
+            default = 10,
+            getFunc = function () return InventorySpaceWarning.savedVariables.spaceLimit end,
+            setFunc = function (value) InventorySpaceWarning.savedVariables.spaceLimit = value end,
+        }
+    }
+    LAM:RegisterAddonPanel(panelName, panelData)
+    LAM:RegisterOptionControls(panelName, optionsTable)
+end
+
 local function _initialize()
     EVENT_MANAGER:RegisterForEvent(InventorySpaceWarning.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, _onInventoryChanged)
     EVENT_MANAGER:AddFilterForEvent(InventorySpaceWarning.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
 
     InventorySpaceWarning.savedVariables = ZO_SavedVars:NewCharacterIdSettings("InventorySpaceWarningSavedVariables", 1, nil, {})
     _restoreSavedPosition()
+
+    _initializeSettings()
 
     local fragment = HUD_FRAGMENT
     fragment:RegisterCallback("StateChange", _onfragmentChange)
