@@ -4,10 +4,6 @@
       <Dimensions x="60" y="60" />
       <Anchor point="BOTTOMLEFT" relativeTo="GuiRoot" offsetX="150" offsetY="-10" />
 
-      <OnInitialized>
-        InventoryWarning.CheckFreeSlots()
-      </OnInitialized>
-
       <OnMoveStop>
         InventoryWarning.OnIndicatorMoveStop()
       </OnMoveStop>
