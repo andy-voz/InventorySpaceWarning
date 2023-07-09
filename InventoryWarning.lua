@@ -10,12 +10,16 @@ function InventoryWarning.OnIndicatorMoveStop()
     InventoryWarning.savedVariables.top = InventoryWarningIndicator:GetTop()
 end
 
+local function _updateVisibility()
+    InventoryWarningIndicator:SetHidden(not InventoryWarning.showingHud or InventoryWarning.freeSlots > 10)
+end
+
 function InventoryWarning.CheckFreeSlots()
     InventoryWarning.freeSlots = GetNumBagFreeSlots(BAG_BACKPACK)
 
     logger:Debug("Free backpack slots count: %d", InventoryWarning.freeSlots)
     InventoryWarningIndicatorLabel:SetText(InventoryWarning.freeSlots)
-    InventoryWarningIndicator:SetHidden(InventoryWarning.hudShown ~= true or InventoryWarning.freeSlots > 10)
+    _updateVisibility()
 end
 
 local function _onInventoryChanged(_eventCode, _bagId, slotIndex, _isNewItem, _itemSoundCategory, updateReason, _stackCountChange)
@@ -23,11 +27,12 @@ local function _onInventoryChanged(_eventCode, _bagId, slotIndex, _isNewItem, _i
     InventoryWarning.CheckFreeSlots()
 end
 
-local function _restorePosition()
+local function _restoreSavedPosition()
     local left = InventoryWarning.savedVariables.left
     local top = InventoryWarning.savedVariables.top
 
-    if (left ~= nil and top ~= nil) then
+    -- Checking if we have saved positions.
+    if (left and top) then
         InventoryWarningIndicator:ClearAnchors()
         InventoryWarningIndicator:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
     end
@@ -36,11 +41,11 @@ end
 local function _onfragmentChange(oldState, newState)
     logger:Debug("HUD Visibility changed: %s", newState)
     if (newState == SCENE_FRAGMENT_SHOWN ) then
-        InventoryWarning.hudShown = true
-        InventoryWarning.CheckFreeSlots()
+        InventoryWarning.showingHud = true
+        _updateVisibility()
     elseif (newState == SCENE_FRAGMENT_HIDDEN ) then
-        InventoryWarning.hudShown = false
-        InventoryWarning.CheckFreeSlots()
+        InventoryWarning.showingHud = false
+        _updateVisibility()
     end
 end
 
@@ -49,12 +54,12 @@ local function _initialize()
     EVENT_MANAGER:AddFilterForEvent(InventoryWarning.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
 
     InventoryWarning.savedVariables = ZO_SavedVars:NewCharacterIdSettings("InventoryWarningSavedVariables", 1, nil, {})
-    _restorePosition()
+    _restoreSavedPosition()
 
     local fragment = HUD_FRAGMENT
     fragment:RegisterCallback("StateChange", _onfragmentChange)
 
-    InventoryWarning.hudShown = fragment:IsShowing()
+    InventoryWarning.showingHud = fragment:IsShowing()
     InventoryWarning.CheckFreeSlots()
 end
 
