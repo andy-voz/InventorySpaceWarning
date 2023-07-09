@@ -1,8 +1,16 @@
 <GuiXml>
   <Controls>
-    <TopLevelControl name="InventoryWarningIndicator" layer="DL_CONTROLS" mouseEnabled="true" movable="true" clampedToScreen="true">
+    <TopLevelControl name="InventoryWarningIndicator" mouseEnabled="true" movable="true" clampedToScreen="true">
       <Dimensions x="60" y="60" />
       <Anchor point="BOTTOMLEFT" relativeTo="GuiRoot" offsetX="150" offsetY="-10" />
+
+      <OnInitialized>
+        InventoryWarning.CheckFreeSlots()
+      </OnInitialized>
+
+      <OnMoveStop>
+        InventoryWarning.OnIndicatorMoveStop()
+      </OnMoveStop>
  
       <Controls>
         <Texture name="$(parent)Icon" textureFile="InventoryWarning/res/sack-icon.dds">
