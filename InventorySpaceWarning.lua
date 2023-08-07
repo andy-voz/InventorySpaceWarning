@@ -5,6 +5,7 @@ InventorySpaceWarning.name = "InventorySpaceWarning"
 
 local logger = LibDebugLogger(InventorySpaceWarning.name)
 local defaultSpaceLimit = 10
+local defaultIconSize = 50
 
 function InventorySpaceWarning.OnIndicatorMoveStop()
     InventorySpaceWarning.savedVariables.left = InventorySpaceIndicator:GetLeft()
@@ -40,6 +41,14 @@ local function _restoreSavedPosition()
     end
 end
 
+local function _restoreIconSize()
+  local size = InventorySpaceWarning.savedVariables.iconSize
+
+  if (size) then
+    InventorySpaceIndicatorIcon:SetDimensions(size, size)
+  end
+end
+
 local function _onfragmentChange(_oldState, newState)
     logger:Debug("HUD Visibility changed: %s", newState)
     if (newState == SCENE_FRAGMENT_SHOWN ) then
@@ -54,6 +63,11 @@ end
 local function _updateSpaceLimit(value)
     InventorySpaceWarning.savedVariables.spaceLimit = value
     _updateVisibility()
+end
+
+local function _updateIconSize(value)
+  InventorySpaceWarning.savedVariables.iconSize = value
+  _restoreIconSize()
 end
 
 local function _initializeSettings()
@@ -78,6 +92,16 @@ local function _initializeSettings()
             default = defaultSpaceLimit,
             getFunc = function () return InventorySpaceWarning.savedVariables.spaceLimit end,
             setFunc = function (value) _updateSpaceLimit(value) end,
+        },
+        [2] = {
+            type = "slider",
+            name = "Icon size",
+            min = 20,
+            max = 100,
+            step = 1,
+            default = defaultIconSize,
+            getFunc = function () return InventorySpaceWarning.savedVariables.iconSize end,
+            setFunc = function (value) _updateIconSize(value) end,
         }
     }
     LAM:RegisterAddonPanel(panelName, panelData)
@@ -107,6 +131,9 @@ local function _initialize()
       ZO_SavedVars:NewCharacterIdSettings("InventorySpaceWarningSavedVariables", 1, nil, {})
     if not InventorySpaceWarning.savedVariables.spaceLimit then
         InventorySpaceWarning.savedVariables.spaceLimit = defaultSpaceLimit
+    end
+    if not InventorySpaceWarning.savedVariables.iconSize then
+      InventorySpaceWarning.savedVariables.iconSize = defaultIconSize
     end
 
     _restoreSavedPosition()
