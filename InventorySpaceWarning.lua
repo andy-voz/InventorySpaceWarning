@@ -1,5 +1,5 @@
 -- Addon namespace
-InventorySpaceWarning = {}
+local InventorySpaceWarning = {}
 
 InventorySpaceWarning.name = "InventorySpaceWarning"
 
@@ -23,7 +23,8 @@ function InventorySpaceWarning.CheckFreeSlots()
     _updateVisibility()
 end
 
-local function _onInventoryChanged(_eventCode, _bagId, slotIndex, _isNewItem, _itemSoundCategory, updateReason, _stackCountChange)
+local function _onInventoryChanged(_eventCode, _bagId, slotIndex, _isNewItem, _itemSoundCategory,
+                                   updateReason, _stackCountChange)
     logger:Debug("Inventory changed. slotIndex: %s, updateReason: %s", slotIndex, updateReason)
     InventorySpaceWarning.CheckFreeSlots()
 end
@@ -39,7 +40,7 @@ local function _restoreSavedPosition()
     end
 end
 
-local function _onfragmentChange(oldState, newState)
+local function _onfragmentChange(_oldState, newState)
     logger:Debug("HUD Visibility changed: %s", newState)
     if (newState == SCENE_FRAGMENT_SHOWN ) then
         InventorySpaceWarning.showingHud = true
@@ -84,10 +85,20 @@ local function _initializeSettings()
 end
 
 local function _initialize()
-    EVENT_MANAGER:RegisterForEvent(InventorySpaceWarning.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, _onInventoryChanged)
-    EVENT_MANAGER:AddFilterForEvent(InventorySpaceWarning.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
+    EVENT_MANAGER:RegisterForEvent(
+      InventorySpaceWarning.name,
+      EVENT_INVENTORY_SINGLE_SLOT_UPDATE,
+      _onInventoryChanged
+    )
+    EVENT_MANAGER:AddFilterForEvent(
+      InventorySpaceWarning.name,
+      EVENT_INVENTORY_SINGLE_SLOT_UPDATE,
+      REGISTER_FILTER_BAG_ID,
+      BAG_BACKPACK
+    )
 
-    InventorySpaceWarning.savedVariables = ZO_SavedVars:NewCharacterIdSettings("InventorySpaceWarningSavedVariables", 1, nil, {})
+    InventorySpaceWarning.savedVariables =
+      ZO_SavedVars:NewCharacterIdSettings("InventorySpaceWarningSavedVariables", 1, nil, {})
     if not InventorySpaceWarning.savedVariables.spaceLimit then
         InventorySpaceWarning.savedVariables.spaceLimit = defaultSpaceLimit
     end
@@ -102,7 +113,7 @@ local function _initialize()
     InventorySpaceWarning.CheckFreeSlots()
 end
 
-function InventorySpaceWarning.OnAddOnLoaded(event, addonName)
+function InventorySpaceWarning.OnAddOnLoaded(_event, addonName)
     if addonName == InventorySpaceWarning.name then
         _initialize()
         EVENT_MANAGER:UnregisterForEvent(InventorySpaceWarning.name, EVENT_ADD_ON_LOADED)
