@@ -97,6 +97,12 @@ local function _initialize()
       BAG_BACKPACK
     )
 
+    EVENT_MANAGER:RegisterForEvent(
+      InventorySpaceWarning.name,
+      EVENT_INVENTORY_BAG_CAPACITY_CHANGED,
+      _onInventoryChanged
+    )
+
     InventorySpaceWarning.savedVariables =
       ZO_SavedVars:NewCharacterIdSettings("InventorySpaceWarningSavedVariables", 1, nil, {})
     if not InventorySpaceWarning.savedVariables.spaceLimit then
