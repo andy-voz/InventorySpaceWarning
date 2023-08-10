@@ -1,5 +1,5 @@
 -- Addon namespace
-local InventorySpaceWarning = {}
+InventorySpaceWarning = {}
 
 InventorySpaceWarning.name = "InventorySpaceWarning"
 
@@ -14,8 +14,8 @@ local iconsMap = {
 }
 
 function InventorySpaceWarning.OnIndicatorMoveStop()
-    InventorySpaceWarning.savedVariables.left = InventorySpaceIndicator:GetLeft()
-    InventorySpaceWarning.savedVariables.top = InventorySpaceIndicator:GetTop()
+  InventorySpaceWarning.savedVariables.left = InventorySpaceIndicator:GetLeft()
+  InventorySpaceWarning.savedVariables.top = InventorySpaceIndicator:GetTop()
 end
 
 local function _updateVisibility()
@@ -49,10 +49,17 @@ end
 
 local function _restoreIconSize()
   local size = InventorySpaceWarning.savedVariables.iconSize
+  InventorySpaceIndicatorIcon:SetDimensions(size, size)
+end
 
-  if (size) then
-      InventorySpaceIndicatorIcon:SetDimensions(size, size)
-  end
+local function _restoreLabelVisibility()
+  local visible = InventorySpaceWarning.savedVariables.labelVisibility
+  InventorySpaceIndicatorLabel:SetHidden(not visible)
+end
+
+local function _updateLabelVisibility(visible)
+  InventorySpaceWarning.savedVariables.labelVisibility = visible
+  _restoreLabelVisibility()
 end
 
 local function _onfragmentChange(_oldState, newState)
@@ -108,52 +115,69 @@ local function _initializeSettings()
             default = defaultIconSize,
             getFunc = function () return InventorySpaceWarning.savedVariables.iconSize end,
             setFunc = function (value) _updateIconSize(value) end,
+        },
+        [3] = {
+            type = "checkbox",
+            name = "Show Label",
+            getFunc = function() return InventorySpaceWarning.savedVariables.labelVisibility end,
+            setFunc = function(value) _updateLabelVisibility(value) end,
+            width = "full"
         }
     }
     LAM:RegisterAddonPanel(panelName, panelData)
     LAM:RegisterOptionControls(panelName, optionsTable)
 end
 
+local function _initSavedDataVars()
+  if not InventorySpaceWarning.savedVariables.spaceLimit then
+    InventorySpaceWarning.savedVariables.spaceLimit = defaultSpaceLimit
+  end
+  if not InventorySpaceWarning.savedVariables.iconSize then
+    InventorySpaceWarning.savedVariables.iconSize = defaultIconSize
+  end
+  if InventorySpaceWarning.savedVariables.labelVisibility == nil then
+    InventorySpaceWarning.savedVariables.labelVisibility = true
+  end
+end
+
+local function _registerUpdateEvents()
+  EVENT_MANAGER:RegisterForEvent(
+    InventorySpaceWarning.name,
+    EVENT_INVENTORY_SINGLE_SLOT_UPDATE,
+    _onInventoryChanged
+  )
+  EVENT_MANAGER:AddFilterForEvent(
+    InventorySpaceWarning.name,
+    EVENT_INVENTORY_SINGLE_SLOT_UPDATE,
+    REGISTER_FILTER_BAG_ID,
+    BAG_BACKPACK
+  )
+
+  EVENT_MANAGER:RegisterForEvent(
+    InventorySpaceWarning.name,
+    EVENT_INVENTORY_BAG_CAPACITY_CHANGED,
+    _onInventoryChanged
+  )
+end
+
 local function _initialize()
-    EVENT_MANAGER:RegisterForEvent(
-      InventorySpaceWarning.name,
-      EVENT_INVENTORY_SINGLE_SLOT_UPDATE,
-      _onInventoryChanged
-    )
-    EVENT_MANAGER:AddFilterForEvent(
-      InventorySpaceWarning.name,
-      EVENT_INVENTORY_SINGLE_SLOT_UPDATE,
-      REGISTER_FILTER_BAG_ID,
-      BAG_BACKPACK
-    )
+  _registerUpdateEvents()
 
-    EVENT_MANAGER:RegisterForEvent(
-      InventorySpaceWarning.name,
-      EVENT_INVENTORY_BAG_CAPACITY_CHANGED,
-      _onInventoryChanged
-    )
+  InventorySpaceWarning.savedVariables =
+    ZO_SavedVars:NewCharacterIdSettings("InventorySpaceWarningSavedVariables", 1, nil, {})
 
-    InventorySpaceWarning.savedVariables =
-      ZO_SavedVars:NewCharacterIdSettings("InventorySpaceWarningSavedVariables", 1, nil, {})
-    if not InventorySpaceWarning.savedVariables.spaceLimit then
-        InventorySpaceWarning.savedVariables.spaceLimit = defaultSpaceLimit
-    end
-    if not InventorySpaceWarning.savedVariables.iconSize then
-      InventorySpaceWarning.savedVariables.iconSize = defaultIconSize
-    end
-    if not InventorySpaceWarning.savedVariables.labelSize then
-      InventorySpaceWarning.savedVariables.labelSize = defaultLabelSize
-    end
+  _initSavedDataVars()
 
-    _restoreSavedPosition()
-    _restoreIconSize()
-    _initializeSettings()
+  _restoreSavedPosition()
+  _restoreIconSize()
+  _restoreLabelVisibility()
+  _initializeSettings()
 
-    local fragment = HUD_FRAGMENT
-    fragment:RegisterCallback("StateChange", _onfragmentChange)
+  local fragment = HUD_FRAGMENT
+  fragment:RegisterCallback("StateChange", _onfragmentChange)
 
-    InventorySpaceWarning.showingHud = fragment:IsShowing()
-    InventorySpaceWarning.CheckFreeSlots()
+  InventorySpaceWarning.showingHud = fragment:IsShowing()
+  InventorySpaceWarning.CheckFreeSlots()
 end
 
 function InventorySpaceWarning.OnAddOnLoaded(_event, addonName)

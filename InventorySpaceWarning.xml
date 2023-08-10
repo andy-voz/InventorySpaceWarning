@@ -7,7 +7,7 @@
       <OnMoveStop>
         InventorySpaceWarning.OnIndicatorMoveStop()
       </OnMoveStop>
- 
+
       <Controls>
           <Texture name="$(parent)Icon" textureFile="/esoui/art/mainmenu/menubar_inventory_down.dds" color="FF0000">
             <Anchor point="CENTER" />
