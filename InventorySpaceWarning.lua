@@ -7,6 +7,12 @@ local logger = LibDebugLogger(InventorySpaceWarning.name)
 local defaultSpaceLimit = 10
 local defaultIconSize = 50
 
+-- TODO switch between icons option.
+local iconsMap = {
+  Custom = "InventorySpaceWarning/res/sack-icon.dds",
+  ESO = "/esoui/art/mainmenu/menubar_inventory_down.dds"
+}
+
 function InventorySpaceWarning.OnIndicatorMoveStop()
     InventorySpaceWarning.savedVariables.left = InventorySpaceIndicator:GetLeft()
     InventorySpaceWarning.savedVariables.top = InventorySpaceIndicator:GetTop()
@@ -45,7 +51,7 @@ local function _restoreIconSize()
   local size = InventorySpaceWarning.savedVariables.iconSize
 
   if (size) then
-    InventorySpaceIndicatorIcon:SetDimensions(size, size)
+      InventorySpaceIndicatorIcon:SetDimensions(size, size)
   end
 end
 
@@ -135,8 +141,12 @@ local function _initialize()
     if not InventorySpaceWarning.savedVariables.iconSize then
       InventorySpaceWarning.savedVariables.iconSize = defaultIconSize
     end
+    if not InventorySpaceWarning.savedVariables.labelSize then
+      InventorySpaceWarning.savedVariables.labelSize = defaultLabelSize
+    end
 
     _restoreSavedPosition()
+    _restoreIconSize()
     _initializeSettings()
 
     local fragment = HUD_FRAGMENT

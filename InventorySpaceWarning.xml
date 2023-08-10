@@ -9,13 +9,13 @@
       </OnMoveStop>
  
       <Controls>
-        <Texture name="$(parent)Icon" textureFile="InventorySpaceWarning/res/sack-icon.dds">
+          <Texture name="$(parent)Icon" textureFile="/esoui/art/mainmenu/menubar_inventory_down.dds" color="FF0000">
             <Anchor point="CENTER" />
             <Dimensions x="50" y="50"/>
         </Texture>
-        <Label name="$(parent)Label" width="10" height="10" font="ZoFontWinH3" inheritAlpha="true" color="FFFFFF"
+        <Label name="$(parent)Label" width="20" height="20" font="ZoFontWinH4" inheritAlpha="true" color="FFFFFF"
             wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER" text="">
-          <Anchor point="CENTER" relativeTo="$(parent)Icon" relativePoint="BOTTOMRIGHT" offsetX="-5" offsetY="-5"/>
+          <Anchor point="CENTER" relativeTo="$(parent)Icon" relativePoint="BOTTOMRIGHT" offsetX="-10" offsetY="-10"/>
         </Label>
       </Controls>
     </TopLevelControl>
