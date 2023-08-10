@@ -1,8 +1,8 @@
 ## Title: Inventory Space Warning
 ## Author: Pachvara
 ## Description: Adds a warning icon on HUD when the inventory space is low.
-## AddOnVersion: 1
-## Version: 0.0.1
+## AddOnVersion: 2
+## Version: 0.0.2
 ## APIVersion: 101037
 ## DependsOn: LibDebugLogger>=255 LibAddonMenu-2.0
 ## SavedVariables: InventorySpaceWarningSavedVariables
