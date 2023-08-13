@@ -7,10 +7,10 @@
 ## DependsOn: LibDebugLogger>=255 LibAddonMenu-2.0
 ## SavedVariables: InventorySpaceWarningSavedVariables
 
-Init.lua
+src/Init.lua
 
-Constants.lua
-Settings.lua
+src/Constants.lua
+src/Settings.lua
 
-InventorySpaceWarning.lua
-InventorySpaceWarning.xml
+src/InventorySpaceWarning.lua
+ui/InventorySpaceWarning.xml
