@@ -17,9 +17,9 @@ function InventorySpaceWarning.InitializeSettings()
   createIcon = function(panel)
     InventorySpaceWarning.logger:Debug("Recieved callback: %s", panel)
     if panel == InventorySpaceWarningSettingsPanel then
-      icon = WINDOW_MANAGER:CreateControl(nil, panel.controlsToRefresh[2], CT_TEXTURE)
+      icon = WINDOW_MANAGER:CreateControl(nil, panel.controlsToRefresh[4], CT_TEXTURE)
       icon:SetColor(1, 0, 0, 1)
-      icon:SetAnchor(RIGHT, panel.controlsToRefresh[2].combobox, LEFT, -10, 0)
+      icon:SetAnchor(RIGHT, panel.controlsToRefresh[4].combobox, LEFT, -10, 0)
       icon:SetTexture(constants.iconsValues[savedVars.icon])
       icon:SetDimensions(40, 40)
 
@@ -41,6 +41,18 @@ function InventorySpaceWarning.InitializeSettings()
       setFunc = function(value) InventorySpaceWarning.UpdateSpaceLimit(value) end,
     },
     [2] = {
+      type = "checkbox",
+      name = "Show Label",
+      getFunc = function() return savedVars.labelVisibility end,
+      setFunc = function(value) InventorySpaceWarning.UpdateLabelVisibility(value) end,
+      width = "full"
+    },
+    [3] = {
+      type = "header",
+      name = "Icon Settings",
+      width = "full",
+    },
+    [4] = {
       type = "dropdown",
       name = "Icon",
       choices = constants.iconsKeys,
@@ -51,7 +63,7 @@ function InventorySpaceWarning.InitializeSettings()
         InventorySpaceWarning.UpdateIcon(value)
       end
     },
-    [3] = {
+    [5] = {
       type = "slider",
       name = "Icon size",
       min = 20,
@@ -60,13 +72,6 @@ function InventorySpaceWarning.InitializeSettings()
       getFunc = function() return savedVars.iconSize end,
       setFunc = function(value) InventorySpaceWarning.UpdateIconSize(value) end,
     },
-    [4] = {
-      type = "checkbox",
-      name = "Show Label",
-      getFunc = function() return savedVars.labelVisibility end,
-      setFunc = function(value) InventorySpaceWarning.UpdateLabelVisibility(value) end,
-      width = "full"
-    }
   }
   LAM:RegisterAddonPanel(constants.settingPanelName, panelData)
   LAM:RegisterOptionControls(constants.settingPanelName, optionsTable)
