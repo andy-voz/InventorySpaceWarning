@@ -1,0 +1,22 @@
+{
+    "Lua.diagnostics.globals": [
+        "LibDebugLogger",
+        "LibAddonMenu2",
+        "ZO_SavedVars",
+        "EVENT_MANAGER",
+        "EVENT_ADD_ON_LOADED",
+        "EVENT_INVENTORY_SINGLE_SLOT_UPDATE",
+        "REGISTER_FILTER_BAG_ID",
+        "EVENT_INVENTORY_BAG_CAPACITY_CHANGED",
+        "BAG_BACKPACK",
+        "GetNumBagFreeSlots",
+        "TOPLEFT",
+        "SCENE_FRAGMENT_SHOWN",
+        "SCENE_FRAGMENT_HIDDEN",
+        "HUD_FRAGMENT",
+        "GuiRoot",
+        "InventorySpaceIndicator",
+        "InventorySpaceIndicatorLabel",
+        "InventorySpaceIndicatorIcon"
+    ]
+}

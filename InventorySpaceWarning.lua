@@ -1,17 +1,4 @@
--- Addon namespace
-InventorySpaceWarning = {}
-
-InventorySpaceWarning.name = "InventorySpaceWarning"
-
 local logger = LibDebugLogger(InventorySpaceWarning.name)
-local defaultSpaceLimit = 10
-local defaultIconSize = 50
-
--- TODO switch between icons option.
-local iconsMap = {
-  Custom = "InventorySpaceWarning/res/sack-icon.dds",
-  ESO = "/esoui/art/mainmenu/menubar_inventory_down.dds"
-}
 
 function InventorySpaceWarning.OnIndicatorMoveStop()
   InventorySpaceWarning.savedVariables.left = InventorySpaceIndicator:GetLeft()
@@ -57,12 +44,7 @@ local function _restoreLabelVisibility()
   InventorySpaceIndicatorLabel:SetHidden(not visible)
 end
 
-local function _updateLabelVisibility(visible)
-  InventorySpaceWarning.savedVariables.labelVisibility = visible
-  _restoreLabelVisibility()
-end
-
-local function _onfragmentChange(_oldState, newState)
+local function _onfragmentChange(_, newState)
     logger:Debug("HUD Visibility changed: %s", newState)
     if (newState == SCENE_FRAGMENT_SHOWN ) then
         InventorySpaceWarning.showingHud = true
@@ -73,67 +55,12 @@ local function _onfragmentChange(_oldState, newState)
     end
 end
 
-local function _updateSpaceLimit(value)
-    InventorySpaceWarning.savedVariables.spaceLimit = value
-    _updateVisibility()
-end
-
-local function _updateIconSize(value)
-  InventorySpaceWarning.savedVariables.iconSize = value
-  _restoreIconSize()
-end
-
-local function _initializeSettings()
-    local LAM = LibAddonMenu2
-    local panelName = "InventorySpaceWarningSettingsPanel"
-
-    local panelData = {
-        type = "panel",
-        name = "Inventory Space Warning",
-        author = "Pachvara",
-        slashCommand = "/inventorySpaceWarning"
-    }
-
-    local optionsTable = {
-        [1] = {
-            type = "slider",
-            name = "Warn at",
-            tooltip = "Indicator will be shown when this amount of the inventory space is left",
-            min = 1,
-            max = 100,
-            step = 1,
-            default = defaultSpaceLimit,
-            getFunc = function () return InventorySpaceWarning.savedVariables.spaceLimit end,
-            setFunc = function (value) _updateSpaceLimit(value) end,
-        },
-        [2] = {
-            type = "slider",
-            name = "Icon size",
-            min = 20,
-            max = 100,
-            step = 1,
-            default = defaultIconSize,
-            getFunc = function () return InventorySpaceWarning.savedVariables.iconSize end,
-            setFunc = function (value) _updateIconSize(value) end,
-        },
-        [3] = {
-            type = "checkbox",
-            name = "Show Label",
-            getFunc = function() return InventorySpaceWarning.savedVariables.labelVisibility end,
-            setFunc = function(value) _updateLabelVisibility(value) end,
-            width = "full"
-        }
-    }
-    LAM:RegisterAddonPanel(panelName, panelData)
-    LAM:RegisterOptionControls(panelName, optionsTable)
-end
-
 local function _initSavedDataVars()
   if not InventorySpaceWarning.savedVariables.spaceLimit then
-    InventorySpaceWarning.savedVariables.spaceLimit = defaultSpaceLimit
+    InventorySpaceWarning.savedVariables.spaceLimit = InventorySpaceWarning.Constants.spaceLimit
   end
   if not InventorySpaceWarning.savedVariables.iconSize then
-    InventorySpaceWarning.savedVariables.iconSize = defaultIconSize
+    InventorySpaceWarning.savedVariables.iconSize = InventorySpaceWarning.Constants.iconSize
   end
   if InventorySpaceWarning.savedVariables.labelVisibility == nil then
     InventorySpaceWarning.savedVariables.labelVisibility = true
@@ -160,7 +87,7 @@ local function _registerUpdateEvents()
   )
 end
 
-local function _initialize()
+function InventorySpaceWarning.Initialize()
   _registerUpdateEvents()
 
   InventorySpaceWarning.savedVariables =
@@ -168,10 +95,11 @@ local function _initialize()
 
   _initSavedDataVars()
 
+  InventorySpaceWarning:InitializeSettings()
+
   _restoreSavedPosition()
   _restoreIconSize()
   _restoreLabelVisibility()
-  _initializeSettings()
 
   local fragment = HUD_FRAGMENT
   fragment:RegisterCallback("StateChange", _onfragmentChange)
@@ -180,11 +108,19 @@ local function _initialize()
   InventorySpaceWarning.CheckFreeSlots()
 end
 
-function InventorySpaceWarning.OnAddOnLoaded(_event, addonName)
-    if addonName == InventorySpaceWarning.name then
-        _initialize()
-        EVENT_MANAGER:UnregisterForEvent(InventorySpaceWarning.name, EVENT_ADD_ON_LOADED)
-    end
+-- BEGIN: Callbacks for settings
+function InventorySpaceWarning.UpdateLabelVisibility(visible)
+  InventorySpaceWarning.savedVariables.labelVisibility = visible
+  _restoreLabelVisibility()
 end
 
-EVENT_MANAGER:RegisterForEvent(InventorySpaceWarning.name, EVENT_ADD_ON_LOADED, InventorySpaceWarning.OnAddOnLoaded)
+function InventorySpaceWarning.UpdateSpaceLimit(value)
+    InventorySpaceWarning.savedVariables.spaceLimit = value
+    _updateVisibility()
+end
+
+function InventorySpaceWarning.UpdateIconSize(value)
+  InventorySpaceWarning.savedVariables.iconSize = value
+  _restoreIconSize()
+end
+-- BEGIN: end
