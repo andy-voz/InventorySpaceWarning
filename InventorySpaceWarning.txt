@@ -10,6 +10,7 @@
 src/Init.lua
 
 src/Constants.lua
+src/SavedVars.lua
 src/Settings.lua
 
 src/InventorySpaceWarning.lua

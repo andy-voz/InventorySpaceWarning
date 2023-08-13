@@ -1,6 +1,7 @@
 -- Initializing a global namespace for all addon's data/functions.
 InventorySpaceWarning = {}
 InventorySpaceWarning.name = "InventorySpaceWarning"
+InventorySpaceWarning.logger = LibDebugLogger(InventorySpaceWarning.name)
 
 local function _onAddOnLoaded(_, addonName)
     if addonName == InventorySpaceWarning.name then

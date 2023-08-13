@@ -1,69 +1,68 @@
-local logger = LibDebugLogger(InventorySpaceWarning.name)
+local logger = InventorySpaceWarning.logger
 
 function InventorySpaceWarning.OnIndicatorMoveStop()
-  InventorySpaceWarning.savedVariables.left = InventorySpaceIndicator:GetLeft()
-  InventorySpaceWarning.savedVariables.top = InventorySpaceIndicator:GetTop()
+  local savedVariables = InventorySpaceWarning.savedVariables
+  savedVariables.left = InventorySpaceIndicator:GetLeft()
+  savedVariables.top = InventorySpaceIndicator:GetTop()
 end
 
 local function _updateVisibility()
-    InventorySpaceIndicator:SetHidden(not InventorySpaceWarning.showingHud or InventorySpaceWarning.freeSlots > InventorySpaceWarning.savedVariables.spaceLimit)
+  InventorySpaceIndicator:SetHidden(not InventorySpaceWarning.showingHud or
+  InventorySpaceWarning.freeSlots > InventorySpaceWarning.savedVariables.spaceLimit)
 end
 
 function InventorySpaceWarning.CheckFreeSlots()
-    InventorySpaceWarning.freeSlots = GetNumBagFreeSlots(BAG_BACKPACK)
+  InventorySpaceWarning.freeSlots = GetNumBagFreeSlots(BAG_BACKPACK)
 
-    logger:Debug("Free backpack slots count: %d", InventorySpaceWarning.freeSlots)
-    InventorySpaceIndicatorLabel:SetText(InventorySpaceWarning.freeSlots)
-    _updateVisibility()
+  logger:Debug("Free backpack slots count: %d", InventorySpaceWarning.freeSlots)
+  InventorySpaceIndicatorLabel:SetText(InventorySpaceWarning.freeSlots)
+  _updateVisibility()
 end
 
 local function _onInventoryChanged(_eventCode, _bagId, slotIndex, _isNewItem, _itemSoundCategory,
                                    updateReason, _stackCountChange)
-    logger:Debug("Inventory changed. slotIndex: %s, updateReason: %s", slotIndex, updateReason)
-    InventorySpaceWarning.CheckFreeSlots()
+  logger:Debug("Inventory changed. slotIndex: %s, updateReason: %s", slotIndex, updateReason)
+  InventorySpaceWarning.CheckFreeSlots()
 end
 
 local function _restoreSavedPosition()
-    local left = InventorySpaceWarning.savedVariables.left
-    local top = InventorySpaceWarning.savedVariables.top
+  local savedVariables = InventorySpaceWarning.savedVariables
+  local left = savedVariables.left
+  local top = savedVariables.top
 
-    -- Checking if we have saved positions.
-    if (left and top) then
-        InventorySpaceIndicator:ClearAnchors()
-        InventorySpaceIndicator:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
-    end
+  -- Checking if we have saved positions.
+  if (left and top) then
+    InventorySpaceIndicator:ClearAnchors()
+    InventorySpaceIndicator:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
+  end
 end
 
 local function _restoreIconSize()
-  local size = InventorySpaceWarning.savedVariables.iconSize
+  local savedVariables = InventorySpaceWarning.savedVariables
+  local size = savedVariables.iconSize
   InventorySpaceIndicatorIcon:SetDimensions(size, size)
 end
 
+local function _restoreIcon()
+  local savedVariables = InventorySpaceWarning.savedVariables
+  local icon = InventorySpaceWarning.Constants.iconsValues[savedVariables.icon]
+  InventorySpaceIndicatorIcon:SetTexture(icon)
+end
+
 local function _restoreLabelVisibility()
-  local visible = InventorySpaceWarning.savedVariables.labelVisibility
+  local savedVariables = InventorySpaceWarning.savedVariables
+  local visible = savedVariables.labelVisibility
   InventorySpaceIndicatorLabel:SetHidden(not visible)
 end
 
 local function _onfragmentChange(_, newState)
-    logger:Debug("HUD Visibility changed: %s", newState)
-    if (newState == SCENE_FRAGMENT_SHOWN ) then
-        InventorySpaceWarning.showingHud = true
-        _updateVisibility()
-    elseif (newState == SCENE_FRAGMENT_HIDDEN ) then
-        InventorySpaceWarning.showingHud = false
-        _updateVisibility()
-    end
-end
-
-local function _initSavedDataVars()
-  if not InventorySpaceWarning.savedVariables.spaceLimit then
-    InventorySpaceWarning.savedVariables.spaceLimit = InventorySpaceWarning.Constants.spaceLimit
-  end
-  if not InventorySpaceWarning.savedVariables.iconSize then
-    InventorySpaceWarning.savedVariables.iconSize = InventorySpaceWarning.Constants.iconSize
-  end
-  if InventorySpaceWarning.savedVariables.labelVisibility == nil then
-    InventorySpaceWarning.savedVariables.labelVisibility = true
+  logger:Debug("HUD Visibility changed: %s", newState)
+  if (newState == SCENE_FRAGMENT_SHOWN) then
+    InventorySpaceWarning.showingHud = true
+    _updateVisibility()
+  elseif (newState == SCENE_FRAGMENT_HIDDEN) then
+    InventorySpaceWarning.showingHud = false
+    _updateVisibility()
   end
 end
 
@@ -90,15 +89,12 @@ end
 function InventorySpaceWarning.Initialize()
   _registerUpdateEvents()
 
-  InventorySpaceWarning.savedVariables =
-    ZO_SavedVars:NewCharacterIdSettings("InventorySpaceWarningSavedVariables", 1, nil, {})
-
-  _initSavedDataVars()
-
-  InventorySpaceWarning:InitializeSettings()
+  InventorySpaceWarning.InitSavedVars()
+  InventorySpaceWarning.InitializeSettings()
 
   _restoreSavedPosition()
   _restoreIconSize()
+  _restoreIcon()
   _restoreLabelVisibility()
 
   local fragment = HUD_FRAGMENT
@@ -110,17 +106,27 @@ end
 
 -- BEGIN: Callbacks for settings
 function InventorySpaceWarning.UpdateLabelVisibility(visible)
-  InventorySpaceWarning.savedVariables.labelVisibility = visible
+  local savedVariables = InventorySpaceWarning.savedVariables
+  savedVariables.labelVisibility = visible
   _restoreLabelVisibility()
 end
 
 function InventorySpaceWarning.UpdateSpaceLimit(value)
-    InventorySpaceWarning.savedVariables.spaceLimit = value
-    _updateVisibility()
+  local savedVariables = InventorySpaceWarning.savedVariables
+  savedVariables.spaceLimit = value
+  _updateVisibility()
 end
 
 function InventorySpaceWarning.UpdateIconSize(value)
-  InventorySpaceWarning.savedVariables.iconSize = value
+  local savedVariables = InventorySpaceWarning.savedVariables
+  savedVariables.iconSize = value
   _restoreIconSize()
 end
+
+function InventorySpaceWarning.UpdateIcon(value)
+  local savedVariables = InventorySpaceWarning.savedVariables
+  savedVariables.icon = value
+  _restoreIcon()
+end
+
 -- BEGIN: end

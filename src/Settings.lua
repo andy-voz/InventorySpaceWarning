@@ -1,13 +1,33 @@
 function InventorySpaceWarning.InitializeSettings()
   local LAM = LibAddonMenu2
-  local panelName = "InventorySpaceWarningSettingsPanel"
+  local constants = InventorySpaceWarning.Constants
+  local savedVars = InventorySpaceWarning.savedVariables
 
   local panelData = {
     type = "panel",
     name = "Inventory Space Warning",
     author = "Pachvara",
-    slashCommand = "/inventorySpaceWarning"
+    slashCommand = "/inventorySpaceWarning",
+    registerForRefresh = true,
+    registerForDefaults = false,
   }
+
+  local createIcon, icon
+
+  createIcon = function(panel)
+    InventorySpaceWarning.logger:Debug("Recieved callback: %s", panel)
+    if panel == InventorySpaceWarningSettingsPanel then
+      icon = WINDOW_MANAGER:CreateControl(nil, panel.controlsToRefresh[2], CT_TEXTURE)
+      icon:SetColor(1, 0, 0, 1)
+      icon:SetAnchor(RIGHT, panel.controlsToRefresh[2].combobox, LEFT, -10, 0)
+      icon:SetTexture(constants.iconsValues[savedVars.icon])
+      icon:SetDimensions(40, 40)
+
+      CALLBACK_MANAGER:UnregisterCallback("LAM-PanelControlsCreated", createIcon)
+    end
+  end
+
+  CALLBACK_MANAGER:RegisterCallback("LAM-PanelControlsCreated", createIcon)
 
   local optionsTable = {
     [1] = {
@@ -17,28 +37,37 @@ function InventorySpaceWarning.InitializeSettings()
       min = 1,
       max = 100,
       step = 1,
-      default = InventorySpaceWarning.Constants.spaceLimit,
-      getFunc = function() return InventorySpaceWarning.savedVariables.spaceLimit end,
+      getFunc = function() return savedVars.spaceLimit end,
       setFunc = function(value) InventorySpaceWarning.UpdateSpaceLimit(value) end,
     },
     [2] = {
+      type = "dropdown",
+      name = "Icon",
+      choices = constants.iconsKeys,
+      choicesValues = constants.iconsKeys,
+      getFunc = function() return savedVars.icon end,
+      setFunc = function(value)
+        icon:SetTexture(constants.iconsValues[value])
+        InventorySpaceWarning.UpdateIcon(value)
+      end
+    },
+    [3] = {
       type = "slider",
       name = "Icon size",
       min = 20,
       max = 100,
       step = 1,
-      default = InventorySpaceWarning.Constants.iconSize,
-      getFunc = function() return InventorySpaceWarning.savedVariables.iconSize end,
+      getFunc = function() return savedVars.iconSize end,
       setFunc = function(value) InventorySpaceWarning.UpdateIconSize(value) end,
     },
-    [3] = {
+    [4] = {
       type = "checkbox",
       name = "Show Label",
-      getFunc = function() return InventorySpaceWarning.savedVariables.labelVisibility end,
+      getFunc = function() return savedVars.labelVisibility end,
       setFunc = function(value) InventorySpaceWarning.UpdateLabelVisibility(value) end,
       width = "full"
     }
   }
-  LAM:RegisterAddonPanel(panelName, panelData)
-  LAM:RegisterOptionControls(panelName, optionsTable)
+  LAM:RegisterAddonPanel(constants.settingPanelName, panelData)
+  LAM:RegisterOptionControls(constants.settingPanelName, optionsTable)
 end
