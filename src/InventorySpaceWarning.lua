@@ -7,8 +7,15 @@ function InventorySpaceWarning.OnIndicatorMoveStop()
 end
 
 local function _updateVisibility()
-  InventorySpaceIndicator:SetHidden(not InventorySpaceWarning.showingHud or
-  InventorySpaceWarning.freeSlots > InventorySpaceWarning.savedVariables.spaceLimit)
+  if (InventorySpaceWarning.freeSlots > InventorySpaceWarning.savedVariables.spaceLimit) then
+    InventorySpaceIndicator:SetHidden(not InventorySpaceWarning.showingHud or
+      not InventorySpaceWarning.savedVariables.alwaysShow)
+
+    InventorySpaceIndicatorIcon:SetColor(0.7, 0.7, 0.7, 1)
+  else
+    InventorySpaceIndicator:SetHidden(not InventorySpaceWarning.showingHud)
+    InventorySpaceIndicatorIcon:SetColor(1, 0, 0, 1)
+  end
 end
 
 function InventorySpaceWarning.CheckFreeSlots()
@@ -109,6 +116,11 @@ function InventorySpaceWarning.UpdateLabelVisibility(visible)
   local savedVariables = InventorySpaceWarning.savedVariables
   savedVariables.labelVisibility = visible
   _restoreLabelVisibility()
+end
+
+function InventorySpaceWarning.UpdateAlwaysShowState(visible)
+    local savedVariables = InventorySpaceWarning.savedVariables
+    savedVariables.alwaysShow = visible
 end
 
 function InventorySpaceWarning.UpdateSpaceLimit(value)

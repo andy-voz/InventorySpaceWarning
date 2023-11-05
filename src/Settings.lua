@@ -31,28 +31,36 @@ function InventorySpaceWarning.InitializeSettings()
 
   local optionsTable = {
     [1] = {
+      type = "checkbox",
+      name = "Always show",
+      tooltip = "Indicator will be always shown on the screen. It is useful if you want to always be aware of free space left.",
+      getFunc = function() return savedVars.alwaysShow end,
+      setFunc = function(value) InventorySpaceWarning.UpdateAlwaysShowState(value) end,
+      width = "full"
+    },
+    [2] = {
       type = "slider",
       name = "Warn at",
-      tooltip = "Indicator will be shown when this amount of the inventory space is left",
+      tooltip = "Red indicator will be shown when this amount of the inventory space is left",
       min = 1,
-      max = 100,
+      max = 210,
       step = 1,
       getFunc = function() return savedVars.spaceLimit end,
       setFunc = function(value) InventorySpaceWarning.UpdateSpaceLimit(value) end,
     },
-    [2] = {
+    [3] = {
       type = "checkbox",
       name = "Show Label",
       getFunc = function() return savedVars.labelVisibility end,
       setFunc = function(value) InventorySpaceWarning.UpdateLabelVisibility(value) end,
       width = "full"
     },
-    [3] = {
+    [4] = {
       type = "header",
       name = "Icon Settings",
       width = "full",
     },
-    [4] = {
+    [5] = {
       type = "dropdown",
       name = "Icon",
       choices = constants.iconsKeys,
@@ -63,7 +71,7 @@ function InventorySpaceWarning.InitializeSettings()
         InventorySpaceWarning.UpdateIcon(value)
       end
     },
-    [5] = {
+    [6] = {
       type = "slider",
       name = "Icon size",
       min = 20,

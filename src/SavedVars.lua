@@ -15,6 +15,9 @@ function InventorySpaceWarning.InitSavedVars()
   if savedVariables.labelVisibility == nil then
     savedVariables.labelVisibility = true
   end
+  if savedVariables.alwaysShow == nil then
+      savedVariables.alwaysShow = true
+  end
   if savedVariables.icon == nil then
     savedVariables.icon = constants.icon
   end
